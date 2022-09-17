@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 13:03:59 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/13 20:35:40 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/09/17 18:07:00 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,15 @@ void	is_died(t_philo *philo, t_info *info)
 	pthread_mutex_lock(philo->guard);
 	if (philo->is_die)
 	{
-		pthread_mutex_lock(info->guard);
 		if (get_time() - philo->eat_time >= philo->info->time_to_die)
 		{
 			printf("%lld %d died\n", elapsed_time(philo->info), philo->num);
+			pthread_mutex_lock(info->guard);
 			info->is_dead = 0;
+			pthread_mutex_unlock(info->guard);
 		}
 	}
 	pthread_mutex_unlock(philo->guard);
-	pthread_mutex_unlock(info->guard);
 }
 
 
@@ -50,11 +50,11 @@ void ft_monitoring(t_info *info, t_philo **philo)
 			pthread_mutex_unlock(temp[i].guard);
 			i++;
 		}
-		pthread_mutex_lock(info->guard);
 		if (cnt == info->philo_num)
 		{
+			pthread_mutex_lock(info->guard);
 			info->is_dead = 0;
+			pthread_mutex_unlock(info->guard);
 		}
-		pthread_mutex_unlock(info->guard);
 	}
 }

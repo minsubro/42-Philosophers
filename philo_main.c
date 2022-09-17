@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/06 15:49:47 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/13 20:27:18 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/09/17 18:41:05 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,21 +75,17 @@ long long get_time()
 void	take_left_fork(t_philo *philo)
 {
 	pthread_mutex_lock(philo->left_fork);
-	pthread_mutex_lock(philo->info->guard);
-	if (philo->info->is_dead)
+	if (dead_check(philo))
 	{
 		printf("%lld %d has taken a fork\n", get_time() - philo->info->start_time, philo->num);
 	}
-	pthread_mutex_unlock(philo->info->guard);
 }
 
 void	take_right_fork(t_philo *philo)
 {
 	pthread_mutex_lock(philo->right_fork);
-	pthread_mutex_lock(philo->info->guard);
-	if (philo->info->is_dead)
+	if (dead_check(philo))
 		printf("%lld %d has taken a fork\n", get_time() - philo->info->start_time, philo->num);
-	pthread_mutex_unlock(philo->info->guard);
 }
 
 int eat_time_check(long long starttime, t_philo *philo)
@@ -103,15 +99,17 @@ int eat_time_check(long long starttime, t_philo *philo)
 }
 
 void	eatting(t_philo *philo)
-{
-	long long start_time;
-	
-	pthread_mutex_lock(philo->info->guard);
+{	
+	pthread_mutex_lock(philo->guard);
 	philo->eat_time = get_time();
-	printf("%lld %d is eating\n", elapsed_time(philo->info), philo->num);
-	pthread_mutex_unlock(philo->info->guard);
-	while (eat_time_check(philo->eat_time, philo))
-		usleep(100);
+	pthread_mutex_unlock(philo->guard);
+	
+	if (dead_check(philo))
+	{
+		printf("%lld %d is eating\n", elapsed_time(philo->info), philo->num);
+		while (eat_time_check(philo->eat_time, philo))
+			usleep(100);
+	}
 }
 
 void	put_fork(t_philo *philo)
@@ -182,10 +180,8 @@ void	*simulation(void *philo_data)
 			break ;
 		}
 		sleeping(philo);
-		pthread_mutex_lock(philo->info->guard);
-		if (philo->info->is_dead)
+		if (dead_check(philo))
 			printf("%lld %d is thinking\n", elapsed_time(philo->info), philo->num);
-		pthread_mutex_unlock(philo->info->guard);
 	}
 	return (NULL);
 }
@@ -209,14 +205,14 @@ void thread_join(t_philo *philo, t_info info, pthread_mutex_t *fork)
 	int	i;
 
 	i = 0;
-	pthread_mutex_destroy(info.guard);
 	while (i < info.philo_num)
 	{
-		pthread_detach(philo[i].simulation);
+		pthread_join(philo[i].simulation, 0);
 		pthread_mutex_destroy(philo[i].guard);
 		pthread_mutex_destroy(&fork[i]);
 		i++;
 	}
+	pthread_mutex_destroy(info.guard);
 }
 
 int main(int ac, char **av)
