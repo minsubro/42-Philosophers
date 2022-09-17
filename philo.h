@@ -56,5 +56,6 @@ void ft_monitoring(t_info *info, t_philo **philo);
 void	is_died(t_philo *philo, t_info *info);
 long long get_time(void);
 long long elapsed_time(t_info *info);
+int	dead_check(t_philo *philo);
 
 #endif

@@ -15,24 +15,20 @@
 void	is_died(t_philo *philo, t_info *info)
 {
 	pthread_mutex_lock(philo->guard);
-	if (get_time() - philo->eat_time >= philo->info->time_to_die)
+	if (philo->is_die)
 	{
-		printf("%lld %d died\n", elapsed_time(philo->info), philo->num + 1);
-		info->is_dead = 0;
+		pthread_mutex_lock(info->guard);
+		if (get_time() - philo->eat_time >= philo->info->time_to_die)
+		{
+			printf("%lld %d died\n", elapsed_time(philo->info), philo->num);
+			info->is_dead = 0;
+		}
 	}
 	pthread_mutex_unlock(philo->guard);
+	pthread_mutex_unlock(info->guard);
 }
 
-int	must_eat(t_philo *philo)
-{
-	if (philo->eat_count == philo->info->philo_must_eat)
-	{
-		philo->is_die = 0;
-		return (1);
-	}
-	else
-		return (0);
-}
+
 
 void ft_monitoring(t_info *info, t_philo **philo)
 {
@@ -49,16 +45,16 @@ void ft_monitoring(t_info *info, t_philo **philo)
 		{
 			is_died(&temp[i], info);
 			pthread_mutex_lock(temp[i].guard);
-			if (must_eat(&temp[i]))
+			if (temp[i].is_die == 0)
 				cnt++;
 			pthread_mutex_unlock(temp[i].guard);
 			i++;
 		}
+		pthread_mutex_lock(info->guard);
 		if (cnt == info->philo_num)
 		{
-			pthread_mutex_lock(info->guard);
 			info->is_dead = 0;
-			pthread_mutex_unlock(info->guard);
 		}
+		pthread_mutex_unlock(info->guard);
 	}
 }

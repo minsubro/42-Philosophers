@@ -75,22 +75,27 @@ long long get_time()
 void	take_left_fork(t_philo *philo)
 {
 	pthread_mutex_lock(philo->left_fork);
-	printf("%lld %d has taken a fork\n", get_time() - philo->info->start_time, philo->num);
+	pthread_mutex_lock(philo->info->guard);
+	if (philo->info->is_dead)
+	{
+		printf("%lld %d has taken a fork\n", get_time() - philo->info->start_time, philo->num);
+	}
+	pthread_mutex_unlock(philo->info->guard);
 }
 
 void	take_right_fork(t_philo *philo)
 {
 	pthread_mutex_lock(philo->right_fork);
-	printf("%lld %d has taken a fork\n", get_time() - philo->info->start_time, philo->num);
+	pthread_mutex_lock(philo->info->guard);
+	if (philo->info->is_dead)
+		printf("%lld %d has taken a fork\n", get_time() - philo->info->start_time, philo->num);
+	pthread_mutex_unlock(philo->info->guard);
 }
 
 int eat_time_check(long long starttime, t_philo *philo)
 {
 	if (get_time() - starttime >= philo->info->time_to_eat)
 	{
-		pthread_mutex_lock(philo->guard);
-		philo->eat_time = get_time();
-		pthread_mutex_unlock(philo->guard);
 		return (0);
 	}
 	else
@@ -101,9 +106,11 @@ void	eatting(t_philo *philo)
 {
 	long long start_time;
 	
+	pthread_mutex_lock(philo->info->guard);
+	philo->eat_time = get_time();
 	printf("%lld %d is eating\n", elapsed_time(philo->info), philo->num);
-	start_time = get_time();
-	while (eat_time_check(start_time, philo))
+	pthread_mutex_unlock(philo->info->guard);
+	while (eat_time_check(philo->eat_time, philo))
 		usleep(100);
 }
 
@@ -125,11 +132,15 @@ void sleeping(t_philo *philo)
 {
 	long long sleep_start;
 
-	sleep_start = get_time();
-	printf("%lld %d is sleeping\n", elapsed_time(philo->info), philo->num);
-	while (sleep_time_check(sleep_start, philo))
-		usleep(100);
-	
+	if (dead_check(philo))
+	{
+		sleep_start = get_time();
+		printf("%lld %d is sleeping\n", elapsed_time(philo->info), philo->num);
+		while (sleep_time_check(sleep_start, philo))
+			usleep(100);
+	}
+	else
+		return ;
 }
 
 long long elapsed_time(t_info *info)
@@ -146,13 +157,6 @@ int	dead_check(t_philo *philo)
 		return (0);
 	}
 	pthread_mutex_unlock(philo->info->guard);
-	pthread_mutex_lock(philo->guard);
-	if (philo->is_die == 0)
-	{
-		pthread_mutex_unlock(philo->guard);
-		return (0);	
-	}
-	pthread_mutex_unlock(philo->guard);
 	return (1);
 }
 
@@ -162,18 +166,26 @@ void	*simulation(void *philo_data)
 	
 	philo = (t_philo *)philo_data;
 	if (philo->num % 2 == 0)
-		usleep(999);
+		usleep(100);
 	while (dead_check(philo))
 	{
 		take_left_fork(philo);
 		take_right_fork(philo);
 		eatting(philo);
-		pthread_mutex_lock(philo->guard);
-		(philo->eat_count)++;
-		pthread_mutex_unlock(philo->guard);
 		put_fork(philo);
+		(philo->eat_count)++;
+		if (philo->eat_count == philo->info->philo_must_eat)
+		{
+			pthread_mutex_lock(philo->guard);
+			philo->is_die = 0;
+			pthread_mutex_unlock(philo->guard);
+			break ;
+		}
 		sleeping(philo);
-		printf("%lld %d is thinking\n", elapsed_time(philo->info), philo->num);
+		pthread_mutex_lock(philo->info->guard);
+		if (philo->info->is_dead)
+			printf("%lld %d is thinking\n", elapsed_time(philo->info), philo->num);
+		pthread_mutex_unlock(philo->info->guard);
 	}
 	return (NULL);
 }
@@ -190,18 +202,29 @@ void simualtion_start(t_philo **philo, t_info *info)
 		pthread_create(&((*philo)[i].simulation), NULL, simulation, &((*philo)[i]));
 		i++;
 	}
-	
+}
+
+void thread_join(t_philo *philo, t_info info, pthread_mutex_t *fork)
+{
+	int	i;
+
+	i = 0;
+	pthread_mutex_destroy(info.guard);
+	while (i < info.philo_num)
+	{
+		pthread_detach(philo[i].simulation);
+		pthread_mutex_destroy(philo[i].guard);
+		pthread_mutex_destroy(&fork[i]);
+		i++;
+	}
 }
 
 int main(int ac, char **av)
 {
 	pthread_mutex_t *fork;
-	pthread_mutex_t start;
 	t_info			info;
 	t_philo			*philo;
 
-	pthread_mutex_init(&start, 0);
-	pthread_mutex_lock(&start);
 	if (make_info(&info, ac, av) == FALSE)
 	{
 		ft_error("invalid argument!!");
@@ -216,5 +239,5 @@ int main(int ac, char **av)
 	}
 	simualtion_start(&philo, &info);
 	ft_monitoring(&info, &philo);
-	pthread_mutex_unlock(&start);
+	thread_join(philo, info, fork);
 }
