@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 13:04:13 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/13 13:04:14 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/09/18 16:04:54 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,7 @@ int	av_check(char **av)
 	while (av[i])
 	{
 		if (ft_atoi(av[i]) == FALSE)
-		{
-			printf("%s", av[i]);
 			return (FALSE);
-		}
 		i++;
 	}
 	return (TRUE);
