@@ -1,6 +1,8 @@
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-SRCS = philo_bonus_main.c
+SRCS = philo_bonus_main.c	\
+	   ft_atoi_bonus.c		\
+	   time_bonus.c			
 
 NAME = philo_bonus
 OBJS = $(SRCS:.c=.o)
@@ -11,10 +13,10 @@ all : $(NAME)
 bonus : $(BONUS_NAME)
 
 $(NAME) : $(OBJS)
-	$(CC) $^ -o $(NAME)
+	$(CC) $^ -o $(NAME) -lpthread
 
 %.o : %.c
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -c $^ -o $@ 
 
 clean :
 	$(RM) $(OBJS)
