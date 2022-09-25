@@ -1,40 +1,48 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi_bonus.c                                    :+:      :+:    :+:   */
+/*   main_action_bonus.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/24 10:22:28 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/25 20:08:46 by minsukan         ###   ########.fr       */
+/*   Created: 2022/09/25 19:58:17 by minsukan          #+#    #+#             */
+/*   Updated: 2022/09/25 20:08:59 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-int	ft_atoi(char *str)
+void	*kill_wait(void *temp)
 {
-	long long	ref;
-	int			i;
+	t_info	*info;
+	int		i;
 
 	i = 0;
-	ref = 0;
-	while (*str == ' ' || (*str >= 9 && *str <= 13))
-		str++;
-	if (*str == '-' || *str == '+')
+	info = (t_info *)temp;
+	usleep(100);
+	sem_wait(info->table);
+	usleep(500);
+	while (i < info->philo_num)
 	{
-		if (*str == '-')
-			ft_error("invalid argument!!");
-		str++;
+		i++;
+		kill(info->pid[i], 2);
 	}
-	while (str[i])
+	return (NULL);
+}
+
+void	main_action(t_info info)
+{
+	pthread_t	killer;
+	int			i;
+
+	usleep(300);
+	sem_post(info.start);
+	pthread_create(&killer, 0, kill_wait, &info);
+	i = 0;
+	while (i < info.philo_num)
 	{
-		if (ref > INT_MAX || ref < INT_MIN || !(str[i] >= '0' && str[i] <= '9'))
-			ft_error("invalid argument!!");
-		ref = ref * 10 + (str[i] - '0');
+		waitpid(info.pid[i], 0, 0);
 		i++;
 	}
-	if (i == 0)
-		ft_error("invalid argument!!");
-	return (ref);
+	pthread_detach(killer);
 }

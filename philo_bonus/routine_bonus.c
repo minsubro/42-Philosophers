@@ -1,28 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time_bonus.c                                       :+:      :+:    :+:   */
+/*   routine_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/24 12:08:47 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/25 20:11:14 by minsukan         ###   ########.fr       */
+/*   Created: 2022/09/25 19:54:08 by minsukan          #+#    #+#             */
+/*   Updated: 2022/09/25 19:55:46 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-long long	get_time(void)
+void	start_routine(t_info info)
 {
-	struct timeval	time;
-	long long		now_time;
-
-	gettimeofday(&time, 0);
-	now_time = time.tv_usec / 1000 + time.tv_sec * 1000;
-	return (now_time);
+	sem_wait(info.start);
+	sem_post(info.start);
 }
 
-long long	elapsed_time(long long start_time)
+void	end_routine(t_philo *philo)
 {
-	return (get_time() - start_time);
+	pthread_detach(philo->die_check);
+	sem_close(philo->check_sem);
+	sem_unlink(philo->philo_name);
+	exit(0);
 }

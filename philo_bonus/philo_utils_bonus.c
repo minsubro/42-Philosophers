@@ -1,40 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi_bonus.c                                    :+:      :+:    :+:   */
+/*   philo_utils_bonus.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/24 10:22:28 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/25 20:08:46 by minsukan         ###   ########.fr       */
+/*   Created: 2022/09/25 10:25:53 by minsukan          #+#    #+#             */
+/*   Updated: 2022/09/25 20:11:11 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
 
-int	ft_atoi(char *str)
+int	ft_strlen(char *str)
 {
-	long long	ref;
-	int			i;
+	int	i;
 
 	i = 0;
-	ref = 0;
-	while (*str == ' ' || (*str >= 9 && *str <= 13))
-		str++;
-	if (*str == '-' || *str == '+')
-	{
-		if (*str == '-')
-			ft_error("invalid argument!!");
-		str++;
-	}
 	while (str[i])
-	{
-		if (ref > INT_MAX || ref < INT_MIN || !(str[i] >= '0' && str[i] <= '9'))
-			ft_error("invalid argument!!");
-		ref = ref * 10 + (str[i] - '0');
 		i++;
-	}
-	if (i == 0)
-		ft_error("invalid argument!!");
-	return (ref);
+	return (i);
+}
+
+char	*ft_strjoin(char *s1, char *s2)
+{
+	char	*temp;
+	int		s1_len;
+	int		s2_len;
+	int		i;
+
+	if (s1 == NULL || s2 == NULL)
+		return (NULL);
+	s1_len = ft_strlen(s1);
+	s2_len = ft_strlen(s2);
+	temp = (char *)malloc(s1_len + s2_len + 1);
+	if (temp == NULL)
+		return (NULL);
+	i = 0;
+	while (*s1 && s2)
+		temp[i++] = *s1++;
+	while (*s2 && s2)
+		temp[i++] = *s2++;
+	temp[i] = 0;
+	return (temp);
 }
