@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 11:57:22 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/18 12:11:51 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/09/24 17:31:37 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	*simulation(void *philo_data)
 
 	philo = (t_philo *)philo_data;
 	if (philo->num % 2 == 0)
-		usleep(100);
+		usleep(800);
 	while (dead_check(philo))
 	{
 		take_left_fork(philo);

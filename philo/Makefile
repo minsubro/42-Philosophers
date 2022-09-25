@@ -17,13 +17,11 @@ RM = rm -f
 
 all : $(NAME)
 
-bonus : $(BONUS_NAME)
-
 $(NAME) : $(OBJS)
-	$(CC) $^ -o $(NAME)
+	$(CC) $^ -o $(NAME) -lpthread
 
 %.o : %.c
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(CFLAGS) -c $^ -o $@ 
 
 clean :
 	$(RM) $(OBJS)
