@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/06 15:49:47 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/25 20:12:40 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/10/01 13:22:21 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void	ft_error(char *str)
 
 void	exception_case(long long time)
 {
+	printf("%d %d has taken a fork\n", 0, 1);
 	usleep(time * 1000);
 	printf("%lld %d died\n", time, 1);
 }

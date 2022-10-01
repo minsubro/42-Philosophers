@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/13 13:04:13 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/18 16:04:54 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/10/01 13:25:05 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ int	ft_atoi(char *str)
 	}
 	while (str[i])
 	{
+		ref = ref * 10 + (str[i] - '0');
 		if (ref > INT_MAX || ref < INT_MIN || !(str[i] >= '0' && str[i] <= '9'))
 			return (FALSE);
-		ref = ref * 10 + (str[i] - '0');
 		i++;
 	}
 	if (i == 0)

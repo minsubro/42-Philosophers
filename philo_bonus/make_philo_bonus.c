@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/25 19:57:03 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/25 20:09:04 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/10/01 13:28:02 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	make_philo(t_info info)
 		sem_wait(info.table);
 		philo->philo_name = ft_strjoin("philo", ft_itoa(philo->num));
 		sem_unlink(philo->philo_name);
-		sem_open(philo->philo_name, O_CREAT, 0644, 1);
+		philo->check_sem = sem_open(philo->philo_name, O_CREAT, 0644, 1);
 		info.philo = philo;
 		philo_action(info, philo);
 		end_routine(philo);

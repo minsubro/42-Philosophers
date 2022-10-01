@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/18 13:59:45 by minsukan          #+#    #+#             */
-/*   Updated: 2022/09/25 20:11:02 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/10/01 13:32:28 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,12 @@ void	ft_error(char *str)
 void	take_fork(t_info info, t_philo *philo)
 {
 	sem_wait(info.fork);
-	sem_wait(info.fork);
 	sem_wait(info.print);
 	printf("%lld %d has taken a fork\n", \
 		elapsed_time(info.start_time), philo->num + 1);
+	sem_post(info.print);
+	sem_wait(info.fork);
+	sem_wait(info.print);
 	printf("%lld %d has taken a fork\n", \
 		elapsed_time(info.start_time), philo->num + 1);
 	sem_post(info.print);
