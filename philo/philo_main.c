@@ -6,7 +6,7 @@
 /*   By: minsukan <minsukan@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/09/06 15:49:47 by minsukan          #+#    #+#             */
-/*   Updated: 2022/10/01 13:22:21 by minsukan         ###   ########.fr       */
+/*   Updated: 2022/10/02 13:44:59 by minsukan         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,12 +37,15 @@ int	make_info(t_info *info, int ac, char **av)
 		info->philo_must_eat = ft_atoi(av[5]);
 	else
 		info->philo_must_eat = -1;
+	if (info->philo_num == 1)
+	{
+		exception_case(info->time_to_die);
+		return (TRUE);
+	}
 	info->guard = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
 	if (!(info->guard))
 		return (FALSE);
 	pthread_mutex_init(info->guard, 0);
-	if (info->philo_num == 1)
-		exception_case(info->time_to_die);
 	return (TRUE);
 }
 
